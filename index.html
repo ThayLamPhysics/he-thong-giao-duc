@@ -1218,8 +1218,8 @@
 
                 const card = document.createElement('div');
                 card.style.animationDelay = `${index * 0.1}s`;
-                // Thêm onclick trực tiếp vào card
-                card.onclick = function () { openModal(lesson.id); };
+                // Thêm onclick trực tiếp vào card -> Mở ngay lập tức
+                card.onclick = function () { openLessonDirectly(lesson.id); };
 
                 card.className = 'lesson-card bg-white rounded-2xl p-5 border border-slate-100 shadow-sm cursor-pointer flex items-center gap-4 relative fade-in hover:shadow-md transition-all';
                 card.innerHTML = `
@@ -1235,15 +1235,46 @@
             });
         }
 
+        // Hàm mở bài học ngay lập tức (Bỏ qua Modal)
+        function openLessonDirectly(id) {
+            const newContent = (typeof contentDatabase !== 'undefined') ? contentDatabase : [];
+            const allLessons = [...database, ...newContent];
+            const lesson = allLessons.find(i => i.id == id);
+
+            if (!lesson) {
+                console.error('Lesson not found:', id);
+                return;
+            }
+
+            let url = lesson.link;
+
+            // Xử lý link GitHub Pages
+            if (!url && lesson.filePath) {
+                const GITHUB_BASE_URL = 'https://ThayLamPhysics.github.io/he-thong-giao-duc/';
+                url = GITHUB_BASE_URL + lesson.filePath;
+            }
+
+            if (url) {
+                // showToast(`Đang mở: ${lesson.title}...`);
+                window.open(url, '_blank');
+            } else {
+                showToast("Lỗi: Không tìm thấy link bài học!", 'error');
+            }
+        }
+
         const modal = document.getElementById('lessonModal');
         let currentSelectedLesson = null;
 
+        // Giữ lại hàm openModal cũ phòng khi cần dùng sau này, nhưng hiện tại không gọi nữa
         function openModal(id) {
             console.log('Clicked content ID:', id);
 
             // Tìm trong cả database cũ và database mới
-            // Sử dụng == thay vì === để so sánh lỏng (số với chuỗi đều được)
-            const allLessons = [...database, ...(window.contentDatabase || [])];
+            // Sử dụng contentDatabase trực tiếp thay vì window.contentDatabase
+            const newContent = (typeof contentDatabase !== 'undefined') ? contentDatabase : [];
+            const allLessons = [...database, ...newContent];
+
+            // So sánh lỏng (==) để tránh lỗi type mismatch
             const lesson = allLessons.find(i => i.id == id);
 
             if (!lesson) {
@@ -1277,7 +1308,9 @@
             headerBg.className = `h-32 flex items-center justify-center relative overflow-hidden bg-${color}-50`;
 
             const modalIcon = document.getElementById('modalIcon');
-            modalIcon.className = `fa-solid ${lesson.icon} text-8xl opacity-50 transform translate-y-2 text-${color}-200`;
+            // Đảm bảo icon class hợp lệ
+            const iconClass = lesson.icon || 'fa-book';
+            modalIcon.className = `fa-solid ${iconClass} text-8xl opacity-50 transform translate-y-2 text-${color}-200`;
 
             modal.classList.remove('hidden');
             document.body.style.overflow = 'hidden';
@@ -1288,27 +1321,17 @@
             document.body.style.overflow = 'auto';
         }
 
+        // Hàm startLearning cũ (có thể không dùng nữa nhưng cứ giữ lại)
         function startLearning() {
             if (!currentSelectedLesson) return;
 
-            // Ưu tiên link (bài cũ) hoặc filePath (bài mới)
+            // Ưu tiên link (bài cũ)
             let url = currentSelectedLesson.link;
 
-            // Nếu là bài mới (có filePath), tạo URL GitHub Pages
+            // Nếu là bài mới (có filePath), LUÔN LUÔN tạo URL trỏ về GitHub Pages
             if (!url && currentSelectedLesson.filePath) {
-                // Tự động nhận diện base URL
-                const parser = document.createElement('a');
-                parser.href = window.location.href;
-
-                // Nếu đang chạy local (file://), mở file tương đối
-                if (window.location.protocol === 'file:') {
-                    url = currentSelectedLesson.filePath;
-                } else {
-                    // Nếu đang chạy trên GitHub Pages, dùng đường dẫn tương đối hoặc tuyệt đối
-                    // Ví dụ: https://username.github.io/repo/content/...
-                    // currentSelectedLesson.filePath đã là "content/..."
-                    url = currentSelectedLesson.filePath;
-                }
+                const GITHUB_BASE_URL = 'https://ThayLamPhysics.github.io/he-thong-giao-duc/';
+                url = GITHUB_BASE_URL + currentSelectedLesson.filePath;
             }
 
             if (!url) {
@@ -1316,6 +1339,7 @@
                 return;
             }
 
+            showToast(`Dang mở bài học: ${currentSelectedLesson.title}...`);
             // Mở link trong tab mới
             window.open(url, '_blank');
         }
