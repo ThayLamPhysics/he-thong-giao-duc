@@ -1,0 +1,1253 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Bảng Điều Khiển | Thầy Lâm EduScience</title>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['"Be Vietnam Pro"', 'sans-serif'] },
+                    colors: {
+                        brand: { blue: '#3B82F6', purple: '#8B5CF6', green: '#10B981', dark: '#0F172A', light: '#F8FAFC' }
+                    },
+                    boxShadow: {
+                        'neon-blue': '0 0 20px rgba(59, 130, 246, 0.5)',
+                        'neon-purple': '0 0 20px rgba(139, 92, 246, 0.5)',
+                        'neon-green': '0 0 20px rgba(16, 185, 129, 0.5)',
+                        'neon-orange': '0 0 20px rgba(249, 115, 22, 0.5)',
+                        'neon-pink': '0 0 20px rgba(236, 72, 153, 0.5)',
+                        'neon-teal': '0 0 20px rgba(20, 184, 166, 0.5)',
+                        'neon-indigo': '0 0 20px rgba(99, 102, 241, 0.5)',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* CSS Ẩn body mặc định để tránh nháy nội dung trước khi render xong */
+        body {
+            display: none;
+        }
+
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+
+        body,
+        html {
+            overflow-x: hidden;
+            width: 100%;
+            max-width: 100vw;
+            position: relative;
+            height: 100%;
+        }
+
+        .lesson-card {
+            transition: all 0.3s ease;
+        }
+
+        .lesson-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+            opacity: 0;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Background Effects */
+        .main-bg-gradient {
+            position: fixed;
+            inset: 0;
+            z-index: -50;
+            background: linear-gradient(to bottom, #f0f9ff 0%, #e0f2fe 100%);
+            overflow: hidden;
+        }
+
+        .horizon-streak {
+            position: absolute;
+            top: 50%;
+            left: 0;
+            width: 100%;
+            height: 6px;
+            background: rgba(59, 130, 246, 0.5);
+            box-shadow: 0 0 40px 10px rgba(59, 130, 246, 0.4), 0 0 80px 30px rgba(147, 197, 253, 0.3);
+            z-index: -10;
+            filter: blur(8px);
+            transform: translateY(-50%);
+        }
+
+        .perspective-grid-bottom {
+            position: absolute;
+            left: -50%;
+            width: 200%;
+            height: 50%;
+            background-image: linear-gradient(rgba(59, 130, 246, 0.15) 1px, transparent 1px), linear-gradient(90deg, rgba(59, 130, 246, 0.15) 1px, transparent 1px);
+            background-size: 80px 80px;
+            z-index: -11;
+            bottom: 0;
+            top: 50%;
+            transform: perspective(600px) rotateX(70deg);
+            transform-origin: center top;
+            animation: gridMoveBottom 20s linear infinite;
+            mask-image: linear-gradient(to bottom, transparent 0%, white 30%);
+            -webkit-mask-image: linear-gradient(to bottom, transparent 0%, white 30%);
+        }
+
+        @keyframes gridMoveBottom {
+            0% {
+                background-position: 0 0;
+            }
+
+            100% {
+                background-position: 0 80px;
+            }
+        }
+
+        /* 3D Carousel CSS */
+        .carousel-scene {
+            margin: 40px auto;
+            position: relative;
+            width: 340px;
+            height: 420px;
+            perspective: 2500px;
+            touch-action: pan-y;
+            z-index: 10;
+        }
+
+        .carousel {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            transform-style: preserve-3d;
+        }
+
+        /* Bỏ transition mặc định để JS control mượt hơn */
+        .carousel-cell {
+            position: absolute;
+            width: 320px;
+            height: 400px;
+            left: 10px;
+            top: 10px;
+            background: rgba(255, 255, 255, 0.65);
+            border-radius: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.1);
+            backdrop-filter: blur(16px);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+            font-size: 24px;
+            font-weight: bold;
+            color: #334155;
+            cursor: pointer;
+            transition: transform 0.6s, opacity 0.6s, border-color 0.3s, box-shadow 0.3s, background 0.3s;
+            opacity: 0.5;
+            transform-origin: center center;
+            /* Ngăn chặn chọn văn bản khi vuốt */
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        .carousel-cell.active-card {
+            opacity: 1;
+            transform: scale(1.05) translateZ(30px);
+            background: rgba(255, 255, 255, 0.85);
+            border: 1px solid rgba(255, 255, 255, 1);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.1);
+            z-index: 100;
+        }
+
+        .nav-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(4px);
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            color: #64748b;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            transition: all 0.2s;
+            z-index: 20;
+        }
+
+        .nav-btn.hover {
+            background: #3b82f6;
+            color: white;
+            border-color: #3b82f6;
+            box-shadow: 0 10px 20px rgba(59, 130, 246, 0.3);
+        }
+
+        .prev-btn {
+            left: -90px;
+        }
+
+        .next-btn {
+            right: -90px;
+        }
+
+        .nav-btn.hidden-btn {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .carousel-cell.card-zoom-in {
+            animation: zoomInEnter 0.8s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+            z-index: 999 !important;
+        }
+
+        @keyframes zoomInEnter {
+            0% {
+                transform: var(--target-transform) scale(1);
+                opacity: 1;
+            }
+
+            40% {
+                opacity: 1;
+            }
+
+            100% {
+                transform: var(--target-transform) scale(4) translateZ(50px);
+                opacity: 0;
+            }
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 640px) {
+            main {
+                height: 100vh !important;
+                display: flex !important;
+                flex-direction: column;
+                overflow: visible !important;
+            }
+
+            #homeView {
+                height: 100%;
+                display: flex;
+                flex-direction: column;
+                justify-content: flex-start;
+                align-items: center;
+                width: 100%;
+            }
+
+            #carouselContainer {
+                flex-grow: 1;
+                width: 100%;
+                display: flex !important;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                padding-bottom: 40px;
+                position: relative;
+                overflow: visible !important;
+            }
+
+            #backgroundLayer {
+                position: absolute;
+                inset: 0;
+                width: 100vw;
+                height: 100vh;
+                overflow: hidden;
+                pointer-events: none;
+                z-index: -10;
+                left: 50%;
+                top: 50%;
+                transform: translate(-50%, -50%);
+            }
+
+            .carousel-scene {
+                width: 260px;
+                height: 320px;
+                perspective: 1000px;
+                margin: 0 !important;
+                transform: translateY(0) !important;
+                z-index: 10;
+            }
+
+            .carousel-cell {
+                width: 240px;
+                height: 300px;
+                font-size: 18px;
+                left: 10px;
+                top: 10px;
+            }
+
+            .nav-btn {
+                width: 40px;
+                height: 40px;
+                font-size: 14px;
+                background: rgba(255, 255, 255, 0.9);
+            }
+
+            .prev-btn {
+                left: -15px;
+            }
+
+            .next-btn {
+                right: -15px;
+            }
+
+            h1 {
+                font-size: 1.3rem !important;
+                margin-bottom: 0.5rem !important;
+                margin-top: 0.5rem;
+            }
+
+            @keyframes zoomInEnter {
+                0% {
+                    transform: var(--target-transform) scale(1);
+                    opacity: 1;
+                }
+
+                40% {
+                    opacity: 1;
+                }
+
+                100% {
+                    transform: var(--target-transform) scale(3) translateZ(20px);
+                    opacity: 0;
+                }
+            }
+        }
+    </style>
+</head>
+
+<body id="mainBody" class="text-slate-600 font-sans antialiased overflow-hidden">
+
+    <div class="main-bg-gradient"></div>
+
+    <script>
+            // Hiển thị body (vì mặc định ẩn để tránh FOUC)
+            (function () {
+                const studentName = localStorage.getItem('username') || 'Học viên';
+                document.addEventListener('DOMContentLoaded', () => {
+                    document.getElementById('mainBody').style.display = 'block';
+                    const nameElements = document.querySelectorAll('.user-display-name');
+                    nameElements.forEach(el => { el.innerText = studentName; });
+                });
+            })();
+    </script>
+
+    <!-- Navbar đã xóa theo yêu cầu -->
+
+    <!-- MAIN CONTENT -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 relative w-full">
+
+        <!-- VIEW 1: HOME (3D CAROUSEL) -->
+        <div id="homeView" class="fade-in transition-opacity duration-500 w-full">
+            <div class="text-center w-full px-2 z-20 shrink-0">
+                <h1
+                    class="text-2xl sm:text-5xl font-extrabold text-slate-800 tracking-tight mb-2 sm:mb-4 drop-shadow-sm">
+                    Chào mừng <span
+                        class="text-transparent bg-clip-text bg-gradient-to-r from-brand-blue to-purple-600 user-display-name block sm:inline">Học
+                        viên</span> <br class="hidden sm:block" />
+                    đến với Khoa Học Tự Nhiên
+                </h1>
+
+                <div class="relative max-w-xl mx-auto group mt-2 sm:mt-6 mb-2">
+                    <div class="absolute inset-y-0 left-4 pl-2 flex items-center pointer-events-none">
+                        <i class="fa-solid fa-search text-slate-400 group-hover:text-brand-blue transition"></i>
+                    </div>
+                    <input type="text" id="globalSearchInput" onkeypress="handleGlobalSearch(event)"
+                        class="block w-full pl-10 pr-4 py-2 sm:py-4 rounded-full border border-white/60 bg-white/60 backdrop-blur-md shadow-lg text-slate-900 placeholder-slate-400 focus:outline-none focus:border-brand-blue focus:ring-1 focus:ring-brand-blue transition text-sm sm:text-lg"
+                        placeholder="Tìm kiếm bài học...">
+                    <button onclick="executeGlobalSearch()"
+                        class="absolute right-4 top-1 sm:top-2 bg-brand-blue text-white rounded-full w-8 h-8 sm:w-10 sm:h-10 hover:bg-blue-600 transition flex items-center justify-center shadow-lg shadow-blue-500/30"><i
+                            class="fa-solid fa-arrow-right text-xs sm:text-base"></i></button>
+                </div>
+            </div>
+
+            <div id="carouselContainer" class="relative w-full max-w-full shrink-0 sm:shrink">
+                <div id="backgroundLayer">
+                    <div class="horizon-streak"></div>
+                    <div class="perspective-grid-bottom"></div>
+                </div>
+                <div class="carousel-scene">
+                    <div class="carousel" id="gradeCarousel"></div>
+                    <!-- Nút bấm vẫn giữ để dùng trên PC -->
+                    <button class="nav-btn prev-btn" onclick="manualRotate(-1)"><i
+                            class="fa-solid fa-chevron-left"></i></button>
+                    <button class="nav-btn next-btn" onclick="manualRotate(1)"><i
+                            class="fa-solid fa-chevron-right"></i></button>
+                </div>
+            </div>
+        </div>
+
+        <!-- VIEW 2: CATEGORY SELECTION -->
+        <div id="categoryView" class="hidden w-full h-full overflow-y-auto pb-20">
+            <div class="max-w-4xl mx-auto">
+                <div class="flex items-center gap-4 mb-8 fade-in">
+                    <button onclick="goBackToHome()"
+                        class="flex items-center justify-center w-10 h-10 rounded-full bg-white border border-slate-200 text-slate-500 hover:border-brand-blue hover:text-brand-blue transition">
+                        <i class="fa-solid fa-arrow-left"></i>
+                    </button>
+                    <div>
+                        <h2 class="text-2xl font-bold text-slate-900" id="categoryTitle">Lớp 6</h2>
+                        <p class="text-sm text-slate-500">Chọn danh mục bạn muốn xem</p>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                    <!-- Bài giảng -->
+                    <div onclick="selectCategory('lectures')"
+                        class="group cursor-pointer bg-white rounded-3xl p-8 border-2 border-slate-200 hover:border-blue-500 transition-all duration-300 hover:shadow-xl hover:-translate-y-2">
+                        <div
+                            class="w-20 h-20 rounded-2xl bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                            <i class="fas fa-book text-4xl text-white"></i>
+                        </div>
+                        <h3 class="text-2xl font-bold text-slate-800 mb-2">Bài giảng</h3>
+                        <p class="text-slate-600">Lý thuyết và kiến thức cơ bản</p>
+                        <div class="mt-4 flex items-center text-blue-600 font-semibold">
+                            <span>Xem ngay</span>
+                            <i class="fas fa-arrow-right ml-2 group-hover:translate-x-2 transition-transform"></i>
+                        </div>
+                    </div>
+
+                    <!-- Bài tập về nhà -->
+                    <div onclick="selectCategory('homework')"
+                        class="group cursor-pointer bg-white rounded-3xl p-8 border-2 border-slate-200 hover:border-green-500 transition-all duration-300 hover:shadow-xl hover:-translate-y-2">
+                        <div
+                            class="w-20 h-20 rounded-2xl bg-gradient-to-br from-green-400 to-green-600 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                            <i class="fas fa-pen-to-square text-4xl text-white"></i>
+                        </div>
+                        <h3 class="text-2xl font-bold text-slate-800 mb-2">Bài tập về nhà</h3>
+                        <p class="text-slate-600">Luyện tập và củng cố kiến thức</p>
+                        <div class="mt-4 flex items-center text-green-600 font-semibold">
+                            <span>Xem ngay</span>
+                            <i class="fas fa-arrow-right ml-2 group-hover:translate-x-2 transition-transform"></i>
+                        </div>
+                    </div>
+
+                    <!-- Đề thi -->
+                    <div onclick="selectCategory('exams')"
+                        class="group cursor-pointer bg-white rounded-3xl p-8 border-2 border-slate-200 hover:border-orange-500 transition-all duration-300 hover:shadow-xl hover:-translate-y-2">
+                        <div
+                            class="w-20 h-20 rounded-2xl bg-gradient-to-br from-orange-400 to-orange-600 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                            <i class="fas fa-file-pen text-4xl text-white"></i>
+                        </div>
+                        <h3 class="text-2xl font-bold text-slate-800 mb-2">Đề thi</h3>
+                        <p class="text-slate-600">Đề kiểm tra và đề thi mẫu</p>
+                        <div class="mt-4 flex items-center text-orange-600 font-semibold">
+                            <span>Xem ngay</span>
+                            <i class="fas fa-arrow-right ml-2 group-hover:translate-x-2 transition-transform"></i>
+                        </div>
+                    </div>
+
+                    <!-- Đề cương ôn tập -->
+                    <div onclick="selectCategory('outlines')"
+                        class="group cursor-pointer bg-white rounded-3xl p-8 border-2 border-slate-200 hover:border-purple-500 transition-all duration-300 hover:shadow-xl hover:-translate-y-2">
+                        <div
+                            class="w-20 h-20 rounded-2xl bg-gradient-to-br from-purple-400 to-purple-600 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                            <i class="fas fa-clipboard-list text-4xl text-white"></i>
+                        </div>
+                        <h3 class="text-2xl font-bold text-slate-800 mb-2">Đề cương ôn tập</h3>
+                        <p class="text-slate-600">Tổng hợp kiến thức trọng tâm</p>
+                        <div class="mt-4 flex items-center text-purple-600 font-semibold">
+                            <span>Xem ngay</span>
+                            <i class="fas fa-arrow-right ml-2 group-hover:translate-x-2 transition-transform"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- VIEW 3: LESSON LIST -->
+        <div id="listView" class="hidden w-full h-full overflow-y-auto pb-20">
+            <div class="flex flex-col md:flex-row items-center justify-between mb-8 gap-4 fade-in pt-4"
+                style="animation-delay: 0.1s;">
+                <div class="flex items-center gap-4 w-full md:w-auto">
+                    <button onclick="triggerGoHome()"
+                        class="flex items-center justify-center w-10 h-10 rounded-full bg-white border border-slate-200 text-slate-500 hover:border-brand-blue hover:text-brand-blue transition">
+                        <i class="fa-solid fa-arrow-left"></i>
+                    </button>
+                    <div>
+                        <h2 class="text-2xl font-bold text-slate-900" id="listTitle">Bài giảng</h2>
+                        <p class="text-sm text-slate-500" id="listSubtitle">Danh sách bài học</p>
+                    </div>
+                </div>
+                <div class="relative w-full md:w-80">
+                    <input type="text" id="localSearchInput" onkeyup="filterLessons()"
+                        class="block w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 bg-white/80 backdrop-blur text-sm text-slate-700 focus:outline-none focus:border-brand-blue focus:ring-1 focus:ring-brand-blue"
+                        placeholder="Tìm trong danh sách...">
+                    <i class="fa-solid fa-search absolute left-3.5 top-3 text-slate-400 text-xs"></i>
+                </div>
+            </div>
+
+            <div class="flex gap-2 overflow-x-auto pb-4 mb-4 no-scrollbar fade-in" style="animation-delay: 0.2s;">
+                <button onclick="setSubject('all')" id="btn-sub-all"
+                    class="filter-btn-sub px-5 py-2 rounded-full text-sm font-bold bg-slate-900 text-white shadow-md whitespace-nowrap">Tất
+                    cả</button>
+                <button onclick="setSubject('ly')" id="btn-sub-ly"
+                    class="filter-btn-sub px-5 py-2 rounded-full text-sm font-bold text-slate-500 bg-white border border-slate-200 hover:text-blue-600 whitespace-nowrap"><i
+                        class="fa-solid fa-bolt mr-1"></i> Vật Lý</button>
+                <button onclick="setSubject('hoa')" id="btn-sub-hoa"
+                    class="filter-btn-sub px-5 py-2 rounded-full text-sm font-bold text-slate-500 bg-white border border-slate-200 hover:text-purple-600 whitespace-nowrap"><i
+                        class="fa-solid fa-flask mr-1"></i> Hóa Học</button>
+                <button onclick="setSubject('sinh')" id="btn-sub-sinh"
+                    class="filter-btn-sub px-5 py-2 rounded-full text-sm font-bold text-slate-500 bg-white border border-slate-200 hover:text-green-600 whitespace-nowrap"><i
+                        class="fa-solid fa-leaf mr-1"></i> Sinh Học</button>
+            </div>
+
+            <div id="lessonGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 fade-in"
+                style="animation-delay: 0.3s;"></div>
+
+            <div id="emptyState"
+                class="hidden text-center py-20 bg-white/60 rounded-3xl border border-dashed border-slate-200 fade-in">
+                <div
+                    class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-slate-50 text-slate-300 mb-4">
+                    <i class="fa-solid fa-flask-vial text-2xl"></i>
+                </div>
+                <h3 class="text-lg font-medium text-slate-900">Không tìm thấy bài học</h3>
+            </div>
+        </div>
+    </main>
+
+    <!-- Modal -->
+    <div id="lessonModal" class="fixed inset-0 z-[100] hidden overflow-y-auto">
+        <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
+            <div class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity" onclick="closeModal()"></div>
+            <div
+                class="inline-block align-bottom bg-white rounded-3xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-2xl sm:w-full relative">
+                <button onclick="closeModal()"
+                    class="absolute top-4 right-4 z-10 w-8 h-8 flex items-center justify-center rounded-full bg-white/80 hover:bg-slate-100 text-slate-500 transition"><i
+                        class="fa-solid fa-xmark"></i></button>
+                <div>
+                    <div id="modalHeaderBg"
+                        class="h-32 bg-slate-100 flex items-center justify-center relative overflow-hidden">
+                        <i id="modalIcon"
+                            class="fa-solid fa-atom text-8xl text-slate-300 opacity-40 transform translate-y-2"></i>
+                        <div class="absolute bottom-4 left-6"><span id="modalSubjectBadge"
+                                class="px-3 py-1 text-xs font-bold rounded-full bg-white/90 text-slate-600 shadow-sm backdrop-blur-md">Môn
+                                học</span></div>
+                    </div>
+                    <div class="px-6 py-6">
+                        <h3 class="text-2xl font-bold text-slate-900 mb-2" id="modalTitle">Tiêu đề</h3>
+                        <p class="text-slate-600 mb-6" id="modalDesc">Mô tả</p>
+                        <div class="bg-blue-50 border border-blue-100 rounded-lg p-3 mb-6 flex items-start gap-3">
+                            <i class="fa-solid fa-folder-open text-blue-500 mt-1"></i>
+                            <div>
+                                <p class="text-sm font-bold text-blue-800">Đường dẫn file:</p>
+                                <p class="text-xs text-blue-600 break-all font-mono" id="modalFilePath">...</p>
+                            </div>
+                        </div>
+                        <div class="pt-6 border-t border-slate-100">
+                            <button onclick="startLearning()"
+                                class="w-full flex justify-center items-center px-6 py-3 border border-transparent rounded-xl shadow-sm text-sm font-semibold text-white bg-brand-blue hover:bg-blue-600 transition">
+                                <i class="fa-solid fa-play mr-2 text-xs"></i> Mở bài học
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- External Link Modal (CẬP NHẬT: ĐÃ XÓA NÚT X THEO YÊU CẦU) -->
+    <div id="externalFrameContainer" class="fixed inset-0 z-[200] hidden bg-white">
+        <div class="relative w-full h-full">
+            <iframe id="externalFrame" src="" class="w-full h-full border-0" allowfullscreen></iframe>
+            <!-- Nút đóng (X) đã được loại bỏ -->
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast"
+        class="fixed bottom-4 right-4 bg-slate-800 text-white px-6 py-3 rounded-lg shadow-lg transform translate-y-24 opacity-0 transition-all duration-300 z-[1000] flex items-center gap-3">
+        <i class="fa-solid fa-circle-info text-blue-400"></i>
+        <span id="toastMessage">Thông báo</span>
+    </div>
+
+    <script>
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toastMessage').innerText = message;
+            toast.classList.remove('translate-y-24', 'opacity-0');
+            setTimeout(() => toast.classList.add('translate-y-24', 'opacity-0'), 3000);
+        }
+
+        function logout() {
+            localStorage.removeItem('isLoggedIn');
+            localStorage.removeItem('username');
+            showToast("Đang làm mới...");
+            setTimeout(() => window.location.reload(), 500);
+        }
+
+        // Không còn nút X, nhưng hàm này vẫn có thể dùng nếu cần gọi bằng code
+        function closeExternalFrame() {
+            const container = document.getElementById('externalFrameContainer');
+            const frame = document.getElementById('externalFrame');
+            container.classList.add('hidden');
+            frame.src = '';
+            triggerGoHome();
+        }
+
+        const database = [
+            { id: 1, title: "Bài 1: Đo độ dài", grade: 6, subject: "ly", icon: "fa-ruler", desc: "Lý thuyết về đơn vị đo và dụng cụ đo.", link: "lessons/bai_1/bai_hoc.html" },
+            { id: 2, title: "Bài 2: Các thể của chất", grade: 6, subject: "hoa", icon: "fa-cube", desc: "Rắn, lỏng, khí và sự chuyển thể.", link: "lessons/bai_2/bai_hoc.html" },
+            { id: 4, title: "Bài 1: Thế giới âm thanh", grade: 7, subject: "ly", icon: "fa-music", desc: "Nguồn âm và sự truyền âm.", link: "lessons/bai_4_am_thanh/index.html" },
+            { id: 99, title: "Bài Kiểm Tra Thử Nghiệm", grade: 6, subject: "sinh", icon: "fa-file-pen", desc: "Bài này file nằm ngay cạnh file dashboard.", link: "bai_kiem_tra_mau.html" }
+        ];
+
+        const grades = [6, 7, 8, 9, 10, 11, 12];
+        const carousel = document.getElementById('gradeCarousel');
+        const cellCount = 7;
+        const theta = 360 / cellCount;
+
+        // --- PHYSICS VARIABLES (Biến Vật Lý) ---
+        let currentRotation = 0; // Góc quay hiện tại (độ)
+        let isDragging = false;
+        let startX = 0;
+        let lastX = 0;
+        let velocity = 0;
+        let animationFrameId = null;
+        let selectedIndex = 0; // Logic index để tương thích code cũ
+
+        let cellWidth, radius, linearSpacing;
+
+        // CẢI TIẾN VẬT LÝ: Rolling Average (Trung bình trượt)
+        let velHistory = []; // Lưu trữ lịch sử vận tốc để tính trung bình
+        const VEL_HISTORY_SIZE = 5; // Số lượng mẫu để tính trung bình
+
+
+        // --- AUDIO & HAPTIC SYSTEM ---
+        let lastTickIndex = -1; // Theo dõi thẻ cuối cùng đã phát âm thanh
+        let audioCtx = null;
+        let audioUnlocked = false; // Cờ kiểm tra trạng thái unlock
+
+        // Khởi tạo AudioContext (an toàn)
+        function initAudio() {
+            if (!audioCtx) {
+                // Hỗ trợ cả Webkit prefix cho iOS cũ
+                const AudioContext = window.AudioContext || window.webkitAudioContext;
+                audioCtx = new AudioContext();
+            }
+        }
+
+        // Hàm mở khóa âm thanh toàn cục (Global Unlock)
+        function unlockAudio() {
+            if (audioUnlocked || !audioCtx) return;
+
+            // Nếu context đang bị treo (suspended), hãy thử resume nó
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume().then(() => {
+                    audioUnlocked = true;
+                });
+            } else {
+                audioUnlocked = true;
+            }
+        }
+
+        // Gắn sự kiện unlock vào toàn bộ document để bắt cú chạm đầu tiên
+        // Chỉ chạy 1 lần duy nhất (once: true)
+        ['touchstart', 'click', 'keydown'].forEach(event => {
+            document.addEventListener(event, () => {
+                initAudio();
+                unlockAudio();
+            }, { once: true });
+        });
+
+        function playClickSound() {
+            // Đảm bảo context tồn tại và đã được resume
+            if (!audioCtx) initAudio();
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(150, audioCtx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(600, audioCtx.currentTime + 0.02);
+            gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.02);
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.03);
+            if (navigator.vibrate) navigator.vibrate(4);
+        }
+
+        function updateDimensions() {
+            const isMobile = window.innerWidth < 640;
+            if (isMobile) {
+                cellWidth = 240;
+                radius = Math.round((cellWidth / 2) / Math.tan(Math.PI / cellCount)) + 20;
+                linearSpacing = 260;
+            } else {
+                cellWidth = 320;
+                radius = Math.round((cellWidth / 2) / Math.tan(Math.PI / cellCount)) + 50;
+                linearSpacing = 380;
+            }
+        }
+
+        function initCarousel() {
+            updateDimensions();
+            carousel.innerHTML = '';
+            currentRotation = 0;
+            velocity = 0;
+            lastTickIndex = 0;
+            updateCarouselVisuals();
+
+            for (let i = 0; i < cellCount; i++) {
+                const grade = grades[i];
+                const cell = document.createElement('div');
+                cell.className = 'carousel-cell';
+
+                let colorClass = '', neonShadow = '';
+                if (i % 2 === 0) { colorClass = 'text-blue-600'; neonShadow = 'shadow-neon-blue'; }
+                else { colorClass = 'text-purple-600'; neonShadow = 'shadow-neon-purple'; }
+                if (grade == 8) { colorClass = 'text-green-600'; neonShadow = 'shadow-neon-green'; }
+                if (grade == 9) { colorClass = 'text-orange-600'; neonShadow = 'shadow-neon-orange'; }
+                if (grade == 10) { colorClass = 'text-pink-600'; neonShadow = 'shadow-neon-pink'; }
+                if (grade == 11) { colorClass = 'text-teal-600'; neonShadow = 'shadow-neon-teal'; }
+                if (grade == 12) { colorClass = 'text-indigo-600'; neonShadow = 'shadow-neon-indigo'; }
+
+                cell.dataset.neon = neonShadow;
+                cell.dataset.index = i;
+                cell.innerHTML = `
+                    <div class="w-24 h-24 rounded-full flex items-center justify-center text-4xl font-bold mb-2 shadow-inner bg-white/60 backdrop-blur-sm border border-white/50 ${colorClass}">
+                        <span>${grade}</span>
+                    </div>
+                    <span class="text-3xl font-extrabold text-slate-700 drop-shadow-sm">Lớp ${grade}</span>
+                    <span class="text-sm text-slate-500 font-medium mt-2 bg-white/50 px-3 py-1 rounded-full border border-white/40">Bấm để vào học</span>
+                `;
+
+                const angle = theta * i;
+                cell.style.transform = `rotateY(${angle}deg) translateZ(${radius}px)`;
+
+                cell.onclick = () => {
+                    if (!isDragging && Math.abs(velocity) < 0.5) {
+                        handleCardClick(i);
+                    }
+                };
+                carousel.appendChild(cell);
+            }
+
+            setupPhysicsSwipe();
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('hidden-btn'));
+            updateActiveCard();
+        }
+
+        window.addEventListener('resize', () => {
+            clearTimeout(window.resizeTimer);
+            window.resizeTimer = setTimeout(() => { updateDimensions(); initCarousel(); }, 100);
+        });
+
+        // --- HỆ THỐNG VẬT LÝ NÂNG CAO (INERTIA PHYSICS 2.0) ---
+
+        function setupPhysicsSwipe() {
+            const scene = document.querySelector('.carousel-scene');
+
+            scene.addEventListener('mousedown', dragStart);
+            scene.addEventListener('touchstart', dragStart, { passive: false });
+
+            window.addEventListener('mousemove', dragMove);
+            window.addEventListener('touchmove', dragMove, { passive: false });
+
+            window.addEventListener('mouseup', dragEnd);
+            window.addEventListener('touchend', dragEnd);
+        }
+
+        function dragStart(e) {
+            // Không cần initAudio ở đây nữa vì đã có Global Unlock
+
+            if (e.target.closest('.nav-btn')) return;
+
+            isDragging = true;
+            cancelAnimationFrame(animationFrameId);
+
+            startX = e.pageX || e.touches[0].pageX;
+            lastX = startX;
+            velocity = 0;
+            velHistory = []; // Reset lịch sử vận tốc
+        }
+
+        function dragMove(e) {
+            if (!isDragging) return;
+            e.preventDefault();
+
+            const x = e.pageX || e.touches[0].pageX;
+            const delta = x - lastX;
+
+            const sensitivity = 0.3; // Độ nhạy
+            currentRotation += delta * sensitivity;
+
+            // Lưu mẫu vận tốc (độ nhạy * delta)
+            velHistory.push(delta * sensitivity);
+            if (velHistory.length > VEL_HISTORY_SIZE) {
+                velHistory.shift(); // Giữ lại N mẫu mới nhất
+            }
+
+            lastX = x;
+            updateCarouselVisuals();
+        }
+
+        function dragEnd(e) {
+            if (!isDragging) return;
+            isDragging = false;
+
+            // Tính vận tốc trung bình từ lịch sử (Rolling Average) để mượt hơn
+            // và tránh trường hợp ngón tay dừng lại đột ngột ở frame cuối cùng
+            if (velHistory.length > 0) {
+                const sum = velHistory.reduce((a, b) => a + b, 0);
+                velocity = sum / velHistory.length;
+            } else {
+                velocity = 0;
+            }
+
+            // Giới hạn vận tốc tối đa để không quay quá điên cuồng
+            const MAX_VELOCITY = 40;
+            if (velocity > MAX_VELOCITY) velocity = MAX_VELOCITY;
+            if (velocity < -MAX_VELOCITY) velocity = -MAX_VELOCITY;
+
+            requestAnimationFrame(inertiaLoop);
+        }
+
+        function inertiaLoop() {
+            if (isDragging) return;
+
+            // Ma sát (Friction):
+            // Tăng lên 0.98 để trôi lâu hơn (mượt hơn), giống quán tính thật hơn
+            const friction = 0.98;
+            velocity *= friction;
+
+            currentRotation += velocity;
+            updateCarouselVisuals();
+
+            // Ngưỡng dừng: Thấp hơn chút để nó trôi đến tận cùng
+            if (Math.abs(velocity) > 0.05) {
+                animationFrameId = requestAnimationFrame(inertiaLoop);
+            } else {
+                snapToGrid();
+            }
+        }
+
+        function snapToGrid() {
+            const nearestIndex = Math.round(currentRotation / theta);
+            const targetAngle = nearestIndex * theta;
+            animateToRotation(targetAngle);
+        }
+
+        function animateToRotation(target) {
+            const start = currentRotation;
+            const diff = target - start;
+            const duration = 500; // Snap chậm hơn chút cho mượt
+            const startTime = performance.now();
+
+            function step(time) {
+                if (isDragging) return;
+
+                const elapsed = time - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+
+                // Ease out cubic mượt mà hơn
+                const ease = 1 - Math.pow(1 - progress, 3);
+
+                currentRotation = start + (diff * ease);
+                updateCarouselVisuals();
+
+                if (progress < 1) {
+                    requestAnimationFrame(step);
+                } else {
+                    let virtualIndex = Math.round(-currentRotation / theta);
+                    let normIndex = virtualIndex % cellCount;
+                    if (normIndex < 0) normIndex += cellCount;
+
+                    selectedIndex = normIndex;
+                    updateActiveCard();
+                }
+            }
+            requestAnimationFrame(step);
+        }
+
+        function updateCarouselVisuals() {
+            carousel.style.transform = `translateZ(-${radius}px) rotateY(${currentRotation}deg)`;
+            updateActiveCard();
+
+            let tickIndex = Math.round(-currentRotation / theta);
+            if (tickIndex !== lastTickIndex) {
+                playClickSound();
+                lastTickIndex = tickIndex;
+            }
+        }
+
+        function updateActiveCard() {
+            const cells = document.querySelectorAll('.carousel-cell');
+            cells.forEach(cell => {
+                cell.classList.remove('active-card');
+                cell.classList.remove(cell.dataset.neon);
+            });
+
+            let virtualIndex = Math.round(-currentRotation / theta);
+            let normIndex = virtualIndex % cellCount;
+            if (normIndex < 0) normIndex += cellCount;
+
+            const activeCell = document.querySelector(`.carousel-cell[data-index="${normIndex}"]`);
+            if (activeCell) {
+                activeCell.classList.add('active-card');
+                activeCell.classList.add(activeCell.dataset.neon);
+            }
+        }
+
+        function manualRotate(dir) {
+            // Vẫn initAudio khi bấm nút cho chắc
+            initAudio();
+            const targetIndex = Math.round(currentRotation / theta) - dir;
+            animateToRotation(targetIndex * theta);
+        }
+
+        // --- LOGIC CLICK & ANIMATION CŨ ---
+
+        function handleCardClick(clickedOriginalIndex) {
+            initAudio();
+            let virtualIndex = Math.round(-currentRotation / theta);
+            let currentNormIndex = virtualIndex % cellCount;
+            if (currentNormIndex < 0) currentNormIndex += cellCount;
+
+            if (currentNormIndex === clickedOriginalIndex) {
+                wingStretchAndEnter(clickedOriginalIndex, grades[clickedOriginalIndex]);
+            } else {
+                let diff = clickedOriginalIndex - currentNormIndex;
+                if (diff > cellCount / 2) diff -= cellCount;
+                if (diff < -cellCount / 2) diff += cellCount;
+
+                const targetAngle = (virtualIndex - diff) * theta;
+                animateToRotation(targetAngle);
+            }
+        }
+
+        function wingStretchAndEnter(centerIndex, grade) {
+            const btns = document.querySelectorAll('.nav-btn');
+            btns.forEach(b => b.classList.add('hidden-btn'));
+            const cells = document.querySelectorAll('.carousel-cell');
+
+            const freezeAngle = currentRotation;
+            carousel.style.transition = 'none';
+            carousel.style.transform = `translateZ(-${radius}px) rotateY(${freezeAngle}deg)`;
+
+            cells.forEach((cell) => {
+                const i = parseInt(cell.dataset.index);
+                let currentCellAngle = i * theta + freezeAngle;
+                while (currentCellAngle > 180) currentCellAngle -= 360;
+                while (currentCellAngle < -180) currentCellAngle += 360;
+
+                cell.style.transition = 'none';
+                cell.style.transform = `rotateY(${i * theta}deg) translateZ(${radius}px)`;
+            });
+
+            void carousel.offsetWidth;
+
+            cells.forEach((cell) => {
+                const i = parseInt(cell.dataset.index);
+                let diff = i - centerIndex;
+                if (diff > cellCount / 2) diff -= cellCount;
+                if (diff < -cellCount / 2) diff += cellCount;
+
+                const translateX = diff * linearSpacing;
+
+                cell.style.transition = 'transform 1s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 1s';
+                cell.style.transform = `rotateY(${i * theta}deg) translateZ(${radius}px) translateX(${translateX}px)`;
+
+                cell.style.opacity = diff === 0 ? 1 : 0;
+            });
+
+            setTimeout(() => {
+                const activeCell = document.querySelector(`.carousel-cell[data-index="${centerIndex}"]`);
+                if (activeCell) {
+                    activeCell.style.setProperty('--target-transform', activeCell.style.transform);
+                    activeCell.classList.add('card-zoom-in');
+                }
+
+                setTimeout(() => {
+                    if (grade === 12) {
+                        const container = document.getElementById('externalFrameContainer');
+                        const frame = document.getElementById('externalFrame');
+                        frame.src = 'https://testphy12-20251218.netlify.app/';
+                        container.classList.remove('hidden');
+                    } else {
+                        selectGrade(grade);
+                    }
+                }, 800);
+            }, 800);
+        }
+
+        function resetCarouselVisuals() { initCarousel(); }
+        window.addEventListener('load', () => { initCarousel(); });
+
+        let currentSubject = 'all', currentGrade = null, currentCategory = null, searchQuery = '';
+        const homeView = document.getElementById('homeView');
+        const categoryView = document.getElementById('categoryView');
+        const listView = document.getElementById('listView');
+        const gridElement = document.getElementById('lessonGrid');
+        const emptyState = document.getElementById('emptyState');
+        const listTitle = document.getElementById('listTitle');
+        const listSubtitle = document.getElementById('listSubtitle');
+
+        // Load database from JSON file or localStorage
+        let contentDatabase = [];
+
+        async function loadDatabase() {
+            try {
+                // Try loading from localStorage first (for admin-created content)
+                const localData = localStorage.getItem('contentDatabase');
+                if (localData) {
+                    contentDatabase = JSON.parse(localData);
+                }
+
+                // Try loading from database.json file
+                const response = await fetch('database.json');
+                if (response.ok) {
+                    const fileData = await response.json();
+                    // Merge with localStorage data (localStorage takes priority)
+                    contentDatabase = [...contentDatabase, ...fileData];
+                }
+            } catch (error) {
+                console.log('No database.json found, using localStorage only');
+            }
+        }
+
+        // Load database on page load
+        window.addEventListener('load', () => {
+            initCarousel();
+            loadDatabase();
+        });
+
+        window.addEventListener('popstate', (event) => {
+            if (event.state && event.state.view === 'category') {
+                currentGrade = event.state.grade;
+                showCategoryViewDOM();
+            } else if (event.state && event.state.view === 'list') {
+                currentGrade = event.state.grade;
+                currentCategory = event.state.category;
+                searchQuery = event.state.search || '';
+                showListViewDOM();
+                renderLessons();
+            } else {
+                showHomeViewDOM();
+            }
+        });
+
+        function triggerGoHome() {
+            history.pushState({ view: 'home' }, '', '');
+            showHomeViewDOM();
+        }
+
+        function goBackToHome() {
+            history.pushState({ view: 'home' }, '', '');
+            showHomeViewDOM();
+        }
+
+        function goBackToCategory() {
+            history.pushState({ view: 'category', grade: currentGrade }, '', '');
+            showCategoryViewDOM();
+        }
+
+        function showHomeViewDOM() {
+            homeView.classList.remove('hidden');
+            categoryView.classList.add('hidden');
+            listView.classList.add('hidden');
+            currentGrade = null;
+            currentCategory = null;
+            window.scrollTo(0, 0);
+            resetCarouselVisuals();
+        }
+
+        function showCategoryViewDOM() {
+            homeView.classList.add('hidden');
+            categoryView.classList.remove('hidden');
+            listView.classList.add('hidden');
+            document.getElementById('categoryTitle').innerText = `Lớp ${currentGrade}`;
+            window.scrollTo(0, 0);
+        }
+
+        function showListViewDOM() {
+            homeView.classList.add('hidden');
+            categoryView.classList.add('hidden');
+            listView.classList.remove('hidden');
+
+            const categoryNames = {
+                lectures: 'Bài giảng',
+                homework: 'Bài tập về nhà',
+                exams: 'Đề thi',
+                outlines: 'Đề cương ôn tập'
+            };
+
+            if (currentCategory) {
+                listTitle.innerText = categoryNames[currentCategory] || 'Nội dung';
+                listSubtitle.innerText = `Lớp ${currentGrade}`;
+            } else if (searchQuery) {
+                listTitle.innerText = `Kết quả tìm kiếm`;
+                listSubtitle.innerText = `"${searchQuery}"`;
+            }
+
+            window.scrollTo(0, 0);
+        }
+
+        function selectGrade(grade) {
+            currentGrade = grade;
+            history.pushState({ view: 'category', grade: grade }, '', '');
+            showCategoryViewDOM();
+        }
+
+        function selectCategory(category) {
+            currentCategory = category;
+            history.pushState({ view: 'list', grade: currentGrade, category: category }, '', '');
+            setSubject('all');
+            showListViewDOM();
+            renderLessons();
+        }
+
+        function handleGlobalSearch(event) { if (event.key === 'Enter') executeGlobalSearch(); }
+
+        function executeGlobalSearch() {
+            const query = document.getElementById('globalSearchInput').value;
+            if (!query.trim()) return;
+            currentGrade = 'all';
+            searchQuery = query;
+            history.pushState({ view: 'list', grade: 'all', search: query }, '', '');
+            listTitle.innerText = `Kết quả tìm kiếm`;
+            listSubtitle.innerText = `"${query}"`;
+            document.getElementById('localSearchInput').value = query;
+            showListViewDOM();
+            renderLessons();
+        }
+
+        function setSubject(subject) {
+            currentSubject = subject;
+            document.querySelectorAll('.filter-btn-sub').forEach(btn => {
+                btn.className = 'filter-btn-sub px-5 py-2 rounded-full text-sm font-bold transition text-slate-500 bg-white border border-slate-200 hover:bg-slate-50 whitespace-nowrap';
+            });
+            const activeBtn = document.getElementById(`btn-sub-${subject}`);
+            if (activeBtn) {
+                if (subject === 'all') activeBtn.className += ' !bg-slate-900 !text-white !border-transparent !shadow-md';
+                else if (subject === 'ly') activeBtn.className += ' !bg-blue-50 !text-blue-600 !border-blue-100';
+                else if (subject === 'hoa') activeBtn.className += ' !bg-purple-50 !text-purple-600 !border-purple-100';
+                else if (subject === 'sinh') activeBtn.className += ' !bg-green-50 !text-green-600 !border-green-100';
+            }
+            renderLessons();
+        }
+
+        function filterLessons() {
+            searchQuery = document.getElementById('localSearchInput').value;
+            renderLessons();
+        }
+
+        function renderLessons() {
+            gridElement.innerHTML = '';
+
+            // Combine old database with new contentDatabase
+            const allContent = [...database, ...contentDatabase];
+
+            const filtered = allContent.filter(item => {
+                const matchGrade = (currentGrade === 'all') ? true : (item.grade === currentGrade);
+                const matchSubject = (currentSubject === 'all') || (item.subject === currentSubject);
+                const matchCategory = !currentCategory || (item.category === currentCategory);
+                const matchSearch = item.title.toLowerCase().includes(searchQuery.toLowerCase());
+                return matchGrade && matchSubject && matchCategory && matchSearch;
+            });
+
+            if (filtered.length === 0) {
+                gridElement.classList.add('hidden');
+                emptyState.classList.remove('hidden');
+                return;
+            }
+            gridElement.classList.remove('hidden');
+            emptyState.classList.add('hidden');
+
+            filtered.forEach((lesson, index) => {
+                let colorClass = lesson.subject === 'ly' ? 'text-blue-600 bg-blue-50' : (lesson.subject === 'hoa' ? 'text-purple-600 bg-purple-50' : 'text-green-600 bg-green-50');
+                let subjectName = lesson.subject === 'ly' ? 'Vật Lý' : (lesson.subject === 'hoa' ? 'Hóa Học' : 'Sinh Học');
+                const card = document.createElement('div');
+                card.style.animationDelay = `${index * 0.1}s`;
+                card.className = 'lesson-card bg-white rounded-2xl p-5 border border-slate-100 shadow-sm cursor-pointer flex items-center gap-4 relative fade-in';
+                card.innerHTML = `
+                    <div class="w-14 h-14 flex-shrink-0 rounded-xl ${colorClass} flex items-center justify-center text-2xl"><i class="fa-solid ${lesson.icon}"></i></div>
+                    <div class="flex-1 min-w-0">
+                        <p class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-0.5">${subjectName} • Lớp ${lesson.grade}</p>
+                        <h4 class="text-lg font-bold text-slate-800 truncate">${lesson.title}</h4>
+                        <p class="text-sm text-slate-500 truncate">${lesson.desc || 'Không có mô tả'}</p>
+                    </div>
+                    <div class="w-8 h-8 rounded-full bg-slate-50 text-slate-400 flex items-center justify-center"><i class="fa-solid fa-chevron-right text-xs"></i></div>
+                    <button onclick="openModal(${lesson.id})" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer"></button>
+                `;
+                gridElement.appendChild(card);
+            });
+        }
+
+        const modal = document.getElementById('lessonModal');
+        let currentSelectedLesson = null;
+
+        function openModal(id) {
+            const lesson = database.find(i => i.id === id);
+            if (!lesson) return;
+            currentSelectedLesson = lesson;
+            document.getElementById('modalTitle').innerText = lesson.title;
+            document.getElementById('modalDesc').innerText = lesson.desc;
+            document.getElementById('modalFilePath').innerText = lesson.link || "Chưa cấu hình";
+            let color = lesson.subject === 'ly' ? 'blue' : (lesson.subject === 'hoa' ? 'purple' : 'green');
+            let name = lesson.subject === 'ly' ? 'Vật Lý' : (lesson.subject === 'hoa' ? 'Hóa Học' : 'Sinh Học');
+            document.getElementById('modalSubjectBadge').innerText = `${name} - Lớp ${lesson.grade}`;
+            document.getElementById('modalSubjectBadge').className = `px-3 py-1 text-xs font-bold rounded-full bg-white/90 text-${color}-600 shadow-sm backdrop-blur-md`;
+            document.getElementById('modalHeaderBg').className = `h-32 bg-${color}-50 flex items-center justify-center relative overflow-hidden`;
+            document.getElementById('modalIcon').className = `fa-solid ${lesson.icon} text-8xl text-${color}-200 opacity-50 transform translate-y-2`;
+            modal.classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+        function closeModal() { modal.classList.add('hidden'); document.body.style.overflow = 'auto'; }
+
+        function startLearning() {
+            if (!currentSelectedLesson || !currentSelectedLesson.link) return showToast("Lỗi: Không tìm thấy link bài học!");
+            showToast(`MÔ PHỎNG: Đang chuyển hướng đến bài học tại "${currentSelectedLesson.link}"`);
+        }
+    </script>
+</body>
+
+</html>
