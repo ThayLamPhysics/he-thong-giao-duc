@@ -1037,21 +1037,31 @@
         async function loadDatabase() {
             try {
                 // Try loading from localStorage first (for admin-created content)
-                const localData = localStorage.getItem('contentDatabase');
-                if (localData) {
-                    contentDatabase = JSON.parse(localData);
-                }
-
-                // Try loading from database.json file
-                const response = await fetch('database.json');
-                if (response.ok) {
-                    const fileData = await response.json();
-                    // Merge with localStorage data (localStorage takes priority)
-                    contentDatabase = [...contentDatabase, ...fileData];
-                }
+                // Fetch trực tiếp từ GitHub để luôn có dữ liệu mới nhất
+                const response = await fetch('https://ThayLamPhysics.github.io/he-thong-giao-duc/database.json');
+                if (!response.ok) throw new Error('Không thể tải dữ liệu');
+                const data = await response.json();
+                contentDatabase = data;
+                console.log('Loaded database from GitHub:', contentDatabase);
             } catch (error) {
-                console.log('No database.json found, using localStorage only');
+                console.warn('Failed to load database from GitHub, trying local...', error);
+
+                // Fallback: Thử tải local nếu lỗi (dành cho debug)
+                try {
+                    const localRes = await fetch('database.json');
+                    if (localRes.ok) {
+                        contentDatabase = await localRes.json();
+                    }
+                } catch (e) {
+                    // Nếu cả 2 đều lỗi, thử lấy từ localStorage cũ (nếu có)
+                    const storedData = localStorage.getItem('contentDatabase');
+                    if (storedData) {
+                        contentDatabase = JSON.parse(storedData);
+                    }
+                }
             }
+            // Kết hợp database cũ nếu cần (tùy nhu cầu, hiện tại ưu tiên GitHub)
+            renderLessons();
         }
 
         // Load database on page load
