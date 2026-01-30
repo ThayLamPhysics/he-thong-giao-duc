@@ -9,5 +9,16 @@
     "icon": "fa-book",
     "filePath": "content/lop-6/bai-giang/bai-giang-1769760376065.html",
     "createdAt": "2026-01-30T08:06:16.065Z"
+  },
+  {
+    "id": 1769760463977,
+    "grade": 7,
+    "category": "lectures",
+    "subject": "ly",
+    "title": "test",
+    "desc": "",
+    "icon": "fa-book",
+    "filePath": "content/lop-7/bai-giang/bai-giang-1769760463977.html",
+    "createdAt": "2026-01-30T08:07:43.977Z"
   }
 ]
