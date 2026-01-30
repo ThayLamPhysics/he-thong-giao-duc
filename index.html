@@ -1007,14 +1007,8 @@
                 }
 
                 setTimeout(() => {
-                    if (grade === 12) {
-                        const container = document.getElementById('externalFrameContainer');
-                        const frame = document.getElementById('externalFrame');
-                        frame.src = 'https://testphy12-20251218.netlify.app/';
-                        container.classList.remove('hidden');
-                    } else {
-                        selectGrade(grade);
-                    }
+                    // Removed special case for grade 12. Now all grades behave the same.
+                    selectGrade(grade);
                 }, 800);
             }, 800);
         }
