@@ -1,16 +1,5 @@
 [
   {
-    "id": 1769760463977,
-    "grade": 7,
-    "category": "lectures",
-    "subject": "ly",
-    "title": "test",
-    "desc": "",
-    "icon": "fa-book",
-    "filePath": "content/lop-7/bai-giang/bai-giang-1769760463977.html",
-    "createdAt": "2026-01-30T08:07:43.977Z"
-  },
-  {
     "id": 1769760642569,
     "grade": 8,
     "category": "lectures",
