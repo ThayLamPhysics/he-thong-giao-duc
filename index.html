@@ -1215,9 +1215,13 @@
             filtered.forEach((lesson, index) => {
                 let colorClass = lesson.subject === 'ly' ? 'text-blue-600 bg-blue-50' : (lesson.subject === 'hoa' ? 'text-purple-600 bg-purple-50' : 'text-green-600 bg-green-50');
                 let subjectName = lesson.subject === 'ly' ? 'Vật Lý' : (lesson.subject === 'hoa' ? 'Hóa Học' : 'Sinh Học');
+
                 const card = document.createElement('div');
                 card.style.animationDelay = `${index * 0.1}s`;
-                card.className = 'lesson-card bg-white rounded-2xl p-5 border border-slate-100 shadow-sm cursor-pointer flex items-center gap-4 relative fade-in';
+                // Thêm onclick trực tiếp vào card
+                card.onclick = function () { openModal(lesson.id); };
+
+                card.className = 'lesson-card bg-white rounded-2xl p-5 border border-slate-100 shadow-sm cursor-pointer flex items-center gap-4 relative fade-in hover:shadow-md transition-all';
                 card.innerHTML = `
                     <div class="w-14 h-14 flex-shrink-0 rounded-xl ${colorClass} flex items-center justify-center text-2xl"><i class="fa-solid ${lesson.icon}"></i></div>
                     <div class="flex-1 min-w-0">
@@ -1226,7 +1230,6 @@
                         <p class="text-sm text-slate-500 truncate">${lesson.desc || 'Không có mô tả'}</p>
                     </div>
                     <div class="w-8 h-8 rounded-full bg-slate-50 text-slate-400 flex items-center justify-center"><i class="fa-solid fa-chevron-right text-xs"></i></div>
-                    <button onclick="openModal(${lesson.id})" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer"></button>
                 `;
                 gridElement.appendChild(card);
             });
@@ -1236,26 +1239,85 @@
         let currentSelectedLesson = null;
 
         function openModal(id) {
-            const lesson = database.find(i => i.id === id);
-            if (!lesson) return;
+            console.log('Clicked content ID:', id);
+
+            // Tìm trong cả database cũ và database mới
+            // Sử dụng == thay vì === để so sánh lỏng (số với chuỗi đều được)
+            const allLessons = [...database, ...(window.contentDatabase || [])];
+            const lesson = allLessons.find(i => i.id == id);
+
+            if (!lesson) {
+                console.error('Lesson not found for ID:', id);
+                return;
+            }
             currentSelectedLesson = lesson;
+
             document.getElementById('modalTitle').innerText = lesson.title;
-            document.getElementById('modalDesc').innerText = lesson.desc;
-            document.getElementById('modalFilePath').innerText = lesson.link || "Chưa cấu hình";
-            let color = lesson.subject === 'ly' ? 'blue' : (lesson.subject === 'hoa' ? 'purple' : 'green');
-            let name = lesson.subject === 'ly' ? 'Vật Lý' : (lesson.subject === 'hoa' ? 'Hóa Học' : 'Sinh Học');
+            // Xử lý mô tả (nếu null thì hiện text mặc định)
+            document.getElementById('modalDesc').innerText = lesson.desc || 'Không có mô tả chi tiết.';
+
+            // Xử lý link hiển thị (chỉ để debug)
+            const displayLink = lesson.link || lesson.filePath || "Chưa có link";
+            document.getElementById('modalFilePath').innerText = displayLink;
+
+            // Xử lý màu sắc
+            let color = 'blue';
+            let name = 'Vật Lý';
+            if (lesson.subject === 'hoa') { color = 'purple'; name = 'Hóa Học'; }
+            if (lesson.subject === 'sinh') { color = 'green'; name = 'Sinh Học'; }
+
             document.getElementById('modalSubjectBadge').innerText = `${name} - Lớp ${lesson.grade}`;
-            document.getElementById('modalSubjectBadge').className = `px-3 py-1 text-xs font-bold rounded-full bg-white/90 text-${color}-600 shadow-sm backdrop-blur-md`;
-            document.getElementById('modalHeaderBg').className = `h-32 bg-${color}-50 flex items-center justify-center relative overflow-hidden`;
-            document.getElementById('modalIcon').className = `fa-solid ${lesson.icon} text-8xl text-${color}-200 opacity-50 transform translate-y-2`;
+
+            // Cập nhật class màu sắc động
+            const badge = document.getElementById('modalSubjectBadge');
+            badge.className = badge.className.replace(/text-\w+-600/, `text-${color}-600`);
+
+            const headerBg = document.getElementById('modalHeaderBg');
+            // Xóa class cũ và thêm class mới
+            headerBg.className = `h-32 flex items-center justify-center relative overflow-hidden bg-${color}-50`;
+
+            const modalIcon = document.getElementById('modalIcon');
+            modalIcon.className = `fa-solid ${lesson.icon} text-8xl opacity-50 transform translate-y-2 text-${color}-200`;
+
             modal.classList.remove('hidden');
             document.body.style.overflow = 'hidden';
         }
-        function closeModal() { modal.classList.add('hidden'); document.body.style.overflow = 'auto'; }
+
+        function closeModal() {
+            modal.classList.add('hidden');
+            document.body.style.overflow = 'auto';
+        }
 
         function startLearning() {
-            if (!currentSelectedLesson || !currentSelectedLesson.link) return showToast("Lỗi: Không tìm thấy link bài học!");
-            showToast(`MÔ PHỎNG: Đang chuyển hướng đến bài học tại "${currentSelectedLesson.link}"`);
+            if (!currentSelectedLesson) return;
+
+            // Ưu tiên link (bài cũ) hoặc filePath (bài mới)
+            let url = currentSelectedLesson.link;
+
+            // Nếu là bài mới (có filePath), tạo URL GitHub Pages
+            if (!url && currentSelectedLesson.filePath) {
+                // Tự động nhận diện base URL
+                const parser = document.createElement('a');
+                parser.href = window.location.href;
+
+                // Nếu đang chạy local (file://), mở file tương đối
+                if (window.location.protocol === 'file:') {
+                    url = currentSelectedLesson.filePath;
+                } else {
+                    // Nếu đang chạy trên GitHub Pages, dùng đường dẫn tương đối hoặc tuyệt đối
+                    // Ví dụ: https://username.github.io/repo/content/...
+                    // currentSelectedLesson.filePath đã là "content/..."
+                    url = currentSelectedLesson.filePath;
+                }
+            }
+
+            if (!url) {
+                showToast("Lỗi: Không tìm thấy nội dung bài học!", 'error');
+                return;
+            }
+
+            // Mở link trong tab mới
+            window.open(url, '_blank');
         }
     </script>
 </body>
